@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTP Performance OS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f11;
+  --surface: #17171b;
+  --surface2: #1e1e24;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f2;
+  --muted: rgba(240,240,242,0.45);
+  --dim: rgba(240,240,242,0.25);
+  --purple: #9d85f5;
+  --purple-dim: rgba(157,133,245,0.15);
+  --teal: #34d9a0;
+  --teal-dim: rgba(52,217,160,0.15);
+  --amber: #f5a623;
+  --amber-dim: rgba(245,166,35,0.15);
+  --coral: #f0685c;
+  --coral-dim: rgba(240,104,92,0.15);
+  --pink: #e876b8;
+  --pink-dim: rgba(232,118,184,0.15);
+  --blue: #5ba8f5;
+  --blue-dim: rgba(91,168,245,0.15);
+  --r: 10px;
+  --r-sm: 6px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.5; }
+
+.hero { background: linear-gradient(135deg, #1a0f3a 0%, #0d2a24 45%, #2a1a08 100%); border-bottom: 1px solid var(--border); padding: 2rem 2.5rem 1.75rem; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(157,133,245,0.12) 0%, transparent 70%); pointer-events: none; }
+.hero-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; }
+.hero-badge { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--purple); background: var(--purple-dim); border: 1px solid rgba(157,133,245,0.25); border-radius: 20px; padding: 3px 10px; display: inline-block; margin-bottom: 8px; }
+.hero-title { font-size: 28px; font-weight: 600; letter-spacing: -.03em; color: var(--text); line-height: 1; }
+.hero-sub { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.week-word-block { text-align: right; }
+.ww-label { font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.ww-word { font-size: 36px; font-weight: 600; letter-spacing: -.04em; background: linear-gradient(135deg, var(--purple), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+.ww-week { font-size: 11px; color: var(--dim); margin-top: 3px; }
+.hero-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { font-size: 11px; font-weight: 500; border-radius: 20px; padding: 4px 12px; border: 1px solid; }
+.pill-purple { color: var(--purple); background: var(--purple-dim); border-color: rgba(157,133,245,0.25); }
+.pill-teal { color: var(--teal); background: var(--teal-dim); border-color: rgba(52,217,160,0.25); }
+.pill-amber { color: var(--amber); background: var(--amber-dim); border-color: rgba(245,166,35,0.25); }
+.pill-coral { color: var(--coral); background: var(--coral-dim); border-color: rgba(240,104,92,0.25); }
+
+.main { padding: 1.5rem 2.5rem 3rem; max-width: 1100px; margin: 0 auto; }
+.section-label { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; margin-top: 1.5rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1.1rem 1.25rem; }
+.card-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.card-title-sub { font-size: 11px; font-weight: 400; color: var(--dim); }
+.card-sm { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: .75rem 1rem; }
+
+.stat-tile { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: .75rem 1rem; }
+.stat-label { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+.stat-val { font-size: 22px; font-weight: 600; letter-spacing: -.03em; line-height: 1; }
+.stat-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
+
+.score-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.score-label { font-size: 11px; color: var(--muted); width: 105px; flex-shrink: 0; text-align: right; }
+.score-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 3px; }
+.score-num { font-size: 11px; font-weight: 500; width: 20px; text-align: right; font-family: 'DM Mono', monospace; }
+
+.day-dots { display: flex; gap: 5px; }
+.day-dot-wrap { flex: 1; text-align: center; }
+.day-lbl { font-size: 9px; color: var(--dim); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
+.day-dot { width: 28px; height: 28px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; border: 1px solid transparent; }
+.dot-hit { background: rgba(52,217,160,0.15); border-color: rgba(52,217,160,0.4); color: var(--teal); }
+.dot-miss { background: rgba(240,104,92,0.12); border-color: rgba(240,104,92,0.3); color: var(--coral); }
+
+.trend-wrap { display: flex; gap: 5px; align-items: flex-end; height: 52px; }
+.trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.trend-bar-fill { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; }
+.trend-wk { font-size: 9px; color: var(--dim); margin-top: 4px; text-align: center; font-family: 'DM Mono', monospace; }
+
+.exv-entry { border-bottom: 1px solid var(--border); padding: 8px 0; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
+.exv-entry:last-child { border-bottom: none; }
+.exv-situation { font-size: 12px; color: var(--text); font-weight: 500; }
+.exv-outcome { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.exv-date { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; white-space: nowrap; }
+
+.thought-entry { border-bottom: 1px solid var(--border); padding: 9px 0; }
+.thought-entry:last-child { border-bottom: none; }
+.thought-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+.thought-situation { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
+.thought-meta { font-size: 10px; color: var(--dim); font-family: 'DM Mono', monospace; white-space: nowrap; }
+.thought-thought { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 4px; border-left: 2px solid var(--coral); padding-left: 8px; }
+.thought-outcome { font-size: 11px; color: var(--muted); border-left: 2px solid var(--teal); padding-left: 8px; }
+.distortion-tag { display: inline-block; font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: rgba(240,104,92,0.12); color: var(--coral); border: 1px solid rgba(240,104,92,0.2); margin-bottom: 5px; }
+.delta-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; font-family: 'DM Mono', monospace; padding: 2px 7px; border-radius: 4px; background: rgba(52,217,160,0.12); color: var(--teal); border: 1px solid rgba(52,217,160,0.2); }
+
+.loop-row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.loop-row:last-child { border-bottom: none; }
+.loop-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.loop-name { font-size: 12px; color: var(--text); font-weight: 500; }
+.loop-domain { font-size: 10px; color: var(--dim); }
+.loop-badge { margin-left: auto; flex-shrink: 0; font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 4px; border: 1px solid; }
+.loop-critical { background: rgba(240,104,92,0.12); color: var(--coral); border-color: rgba(240,104,92,0.25); }
+.loop-priority { background: rgba(245,166,35,0.12); color: var(--amber); border-color: rgba(245,166,35,0.25); }
+.loop-open { background: rgba(255,255,255,0.05); color: var(--dim); border-color: var(--border); }
+
+.reflect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reflect-q { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); margin-bottom: 4px; }
+.reflect-a { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.fw-grid { display: flex; flex-direction: column; gap: 7px; }
+.fw-row { display: flex; gap: 8px; align-items: flex-start; }
+.fw-tag { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+.fw-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+.footer-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.nav-btn { font-size: 11px; font-weight: 500; padding: 6px 14px; border-radius: 20px; background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.divider { border: none; border-top: 1px solid var(--border); margin: .75rem 0; }
+
+@media (max-width: 700px) {
+  .main { padding: 1rem; }
+  .hero { padding: 1.25rem; }
+  .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
+  .hero-top { flex-direction: column; }
+  .week-word-block { text-align: left; }
+  .reflect-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="hero-badge">w/c 16 March 2026 · Coach: Tom Heath</div>
+      <div class="hero-title">BTP Performance OS</div>
+      <div class="hero-sub">Programme start: 28 Jan 2026 · Next call: Tue 17 Mar, 11am</div>
+    </div>
+    <div class="week-word-block">
+      <div class="ww-label">Week word</div>
+      <div class="ww-word">Execute</div>
+      <div class="ww-week">w14 · Mallorca 70.3 in 7 weeks</div>
+    </div>
+  </div>
+  <div class="hero-pills">
+    <span class="pill pill-coral">Mallorca 70.3 — 7 weeks</span>
+    <span class="pill pill-teal">CTL 51 · TSB +1</span>
+    <span class="pill pill-purple">OYF: Research/MVP phase</span>
+    <span class="pill pill-amber">13 open loops</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="section-label">This week at a glance</div>
+  <div class="grid4" style="margin-bottom:12px">
+    <div class="stat-tile">
+      <div class="stat-label">Daily wins total</div>
+      <div class="stat-val" style="color:var(--teal)">39</div>
+      <div class="stat-sub">cumulative since 16 Feb</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Thought log entries</div>
+      <div class="stat-val" style="color:var(--purple)">5</div>
+      <div class="stat-sub">avg delta: −3.6 pts</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Extroversion exercises</div>
+      <div class="stat-val" style="color:var(--pink)">3</div>
+      <div class="stat-sub">1 initiated · 2 reactive</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Open loops</div>
+      <div class="stat-val" style="color:var(--amber)">13</div>
+      <div class="stat-sub">2 priority · 1 closed</div>
+    </div>
+  </div>
+
+  <div class="section-label">BTP scores & training</div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-title">10-category scores — w/c 15 Mar <span class="card-title-sub">59/100</span></div>
+      <div class="score-row"><div class="score-label">Health</div><div class="score-track"><div class="score-fill" style="width:50%;background:var(--coral)"></div></div><div class="score-num" style="color:var(--coral)">5</div></div>
+      <div class="score-row"><div class="score-label">Mental/Emotional</div><div class="score-track"><div class="score-fill" style="width:60%;background:var(--purple)"></div></div><div class="score-num" style="color:var(--purple)">6</div></div>
+      <div class="score-row"><div class="score-label">Partner/Love</div><div class="score-track"><div class="score-fill" style="width:60%;background:var(--pink)"></div></div><div class="score-num" style="color:var(--pink)">6</div></div>
+      <div class="score-row"><div class="score-label">Family</div><div class="score-track"><div class="score-fill" style="width:70%;background:var(--pink)"></div></div><div class="score-num" style="color:var(--pink)">7</div></div>
+      <div class="score-row"><div class="score-label">Friends</div><div class="score-track"><div class="score-fill" style="width:50%;background:var(--blue)"></div></div><div class="score-num" style="color:var(--blue)">5</div></div>
+      <div class="score-row"><div class="score-label">Mission</div><div class="score-track"><div class="score-fill" style="width:50%;background:var(--teal)"></div></div><div class="score-num" style="color:var(--teal)">5</div></div>
+      <div class="score-row"><div class="score-label">Experiences</div><div class="score-track"><div class="score-fill" style="width:70%;background:var(--amber)"></div></div><div class="score-num" style="color:var(--amber)">7</div></div>
+      <div class="score-row"><div class="score-label">Spirit</div><div class="score-track"><div class="score-fill" style="width:60%;background:var(--purple)"></div></div><div class="score-num" style="color:var(--purple)">6</div></div>
+      <div class="score-row"><div class="score-label">Finances</div><div class="score-track"><div class="score-fill" style="width:50%;background:var(--amber)"></div></div><div class="score-num" style="color:var(--amber)">5</div></div>
+      <div class="score-row"><div class="score-label">Learning</div><div class="score-track"><div class="score-fill" style="width:70%;background:var(--teal)"></div></div><div class="score-num" style="color:var(--teal)">7</div></div>
+      <hr class="divider">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:var(--muted)">Trend: 60 → 58 → 59 → <span style="color:var(--coral)">47</span> → <span style="color:var(--teal)">59</span></span>
+        <span style="font-size:11px;color:var(--dim)">Week word: Clear</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="card-title">Score trend — all weeks</div>
+        <div class="trend-wrap">
+          <div class="trend-col"><div class="trend-bar-fill" style="height:100%;background:var(--purple);opacity:.5"></div></div>
+          <div class="trend-col"><div class="trend-bar-fill" style="height:97%;background:var(--purple);opacity:.6"></div></div>
+          <div class="trend-col"><div class="trend-bar-fill" style="height:98%;background:var(--purple);opacity:.75"></div></div>
+          <div class="trend-col"><div class="trend-bar-fill" style="height:78%;background:var(--coral)"></div></div>
+          <div class="trend-col"><div class="trend-bar-fill" style="height:98%;background:var(--teal)"></div></div>
+          <div class="trend-col" style="opacity:.35"><div class="trend-bar-fill" style="height:60%;background:var(--teal);border:1px dashed rgba(52,217,160,0.5)"></div></div>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:4px">
+          <div class="trend-wk" style="flex:1">Consistency<br>60</div>
+          <div class="trend-wk" style="flex:1">Flow<br>58</div>
+          <div class="trend-wk" style="flex:1">Decisive<br>59</div>
+          <div class="trend-wk" style="flex:1"><span style="color:var(--coral)">Clear<br>47</span></div>
+          <div class="trend-wk" style="flex:1">Clear<br>59</div>
+          <div class="trend-wk" style="flex:1"><span style="color:var(--dim)">Execute<br>TBC</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Training — w/c 9 Mar <span class="card-title-sub">5/10 sessions</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+          <div class="stat-tile" style="padding:.6rem .75rem"><div class="stat-label">Sessions</div><div class="stat-val" style="font-size:18px;color:var(--teal)">5<span style="font-size:12px;color:var(--dim)">/10</span></div></div>
+          <div class="stat-tile" style="padding:.6rem .75rem"><div class="stat-label">TSS done</div><div class="stat-val" style="font-size:18px">350<span style="font-size:12px;color:var(--dim)">/560</span></div></div>
+          <div class="stat-tile" style="padding:.6rem .75rem"><div class="stat-label">Weekend TSS</div><div class="stat-val" style="font-size:18px;color:var(--purple)">238</div></div>
+        </div>
+        <div class="day-dots">
+          <div class="day-dot-wrap"><div class="day-lbl">M</div><div class="day-dot dot-miss">✕</div></div>
+          <div class="day-dot-wrap"><div class="day-lbl">T</div><div class="day-dot dot-miss">✕</div></div>
+          <div class="day-dot-wrap"><div class="day-lbl">W</div><div class="day-dot dot-miss">✕</div></div>
+          <div class="day-dot-wrap"><div class="day-lbl">T</div><div class="day-dot dot-hit">✓</div></div>
+          <div class="day-dot-wrap"><div class="day-lbl">F</div><div class="day-dot dot-hit">✓</div></div>
+          <div class="day-dot-wrap"><div class="day-lbl">S</div><div class="day-dot dot-hit">✓</div></div>
+          <div class="day-dot-wrap"><div class="day-lbl">S</div><div class="day-dot dot-hit">✓</div></div>
+        </div>
+      </div>
+
+      <div class="card-sm">
+        <div class="stat-label">Race countdown</div>
+        <div class="stat-val" style="font-size:18px;color:var(--coral)">7 <span style="font-size:14px;font-weight:400;color:var(--muted)">weeks to Mallorca 70.3</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Psychology & growth</div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-title">Extroversion log <span class="card-title-sub">3 exercises total</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+        <div class="stat-tile" style="padding:.6rem;text-align:center"><div class="stat-label">Total</div><div class="stat-val" style="font-size:20px;color:var(--pink)">3</div></div>
+        <div class="stat-tile" style="padding:.6rem;text-align:center"><div class="stat-label">Initiated</div><div class="stat-val" style="font-size:20px;color:var(--purple)">1</div></div>
+        <div class="stat-tile" style="padding:.6rem;text-align:center"><div class="stat-label">Reactive</div><div class="stat-val" style="font-size:20px;color:var(--muted)">2</div></div>
+      </div>
+      <div class="exv-entry">
+        <div><div class="exv-situation">Barbers</div><div class="exv-outcome">Maintained conversation · slight nerves when second client arrived but manageable</div></div>
+        <div class="exv-date">26 Feb</div>
+      </div>
+      <div class="exv-entry">
+        <div><div class="exv-situation">Abbey Swim — pool conversation</div><div class="exv-outcome">Struck up conversation with swimmer known for years but never spoken to. Felt a nice buzz.</div></div>
+        <div class="exv-date">28 Feb</div>
+      </div>
+      <div class="exv-entry">
+        <div><div class="exv-situation">Dance class pick-up</div><div class="exv-outcome">Arrived early, went straight in. Teacher approached about Margot's progress. Exchange while observed.</div></div>
+        <div class="exv-date">10 Mar</div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--dim);font-style:italic">Target: 2–3 exercises per week · Tom: the pool is a playground, not a gauntlet</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Thought log — "Is this 100% true?" <span class="card-title-sub">avg delta −3.6</span></div>
+      <div class="thought-entry">
+        <div class="thought-top"><div class="thought-situation">Barbers</div><div style="display:flex;gap:6px;align-items:center"><span class="thought-meta">26 Feb</span><span class="delta-badge">−3</span></div></div>
+        <span class="distortion-tag">Mind Reading</span>
+        <div class="thought-thought">"I'll look visibly anxious in the mirror"</div>
+        <div class="thought-outcome">Conversation was normal. Slight nerves but manageable.</div>
+      </div>
+      <div class="thought-entry">
+        <div class="thought-top"><div class="thought-situation">Sid's birthday drinks</div><div style="display:flex;gap:6px;align-items:center"><span class="thought-meta">28 Feb</span><span class="delta-badge">−3</span></div></div>
+        <span class="distortion-tag">Mind Reading</span>
+        <div class="thought-thought">"They'll focus on Nat. I won't have much to add."</div>
+        <div class="thought-outcome">Normal conversations. No significant awkwardness — held my own.</div>
+      </div>
+      <div class="thought-entry">
+        <div class="thought-top"><div class="thought-situation">Andy / drinks bill</div><div style="display:flex;gap:6px;align-items:center"><span class="thought-meta">2 Mar</span><span class="delta-badge" style="background:rgba(52,217,160,0.2)">−6</span></div></div>
+        <span class="distortion-tag">Fortune Telling</span>
+        <div class="thought-thought">"He'll think I'm dishonest. He'll bad-mouth me."</div>
+        <div class="thought-outcome">He laughed, said I shouldn't have worried. The gap between thoughts and reality here is crazy.</div>
+      </div>
+      <div class="thought-entry">
+        <div class="thought-top"><div class="thought-situation">Ad agency notice</div><div style="display:flex;gap:6px;align-items:center"><span class="thought-meta">4 Mar</span><span class="delta-badge">−4</span></div></div>
+        <span class="distortion-tag">Fortune Telling</span>
+        <div class="thought-thought">"They'll be defensive. The relationship will break down."</div>
+        <div class="thought-outcome">They apologised immediately. Catastrophising proven over the top again.</div>
+      </div>
+      <div class="thought-entry">
+        <div class="thought-top"><div class="thought-situation">Dance class pick-up</div><div style="display:flex;gap:6px;align-items:center"><span class="thought-meta">10 Mar</span><span class="delta-badge">−2</span></div></div>
+        <span class="distortion-tag">Fortune Telling</span>
+        <div class="thought-thought">"I'll look awkward. I won't know where to look."</div>
+        <div class="thought-outcome">Teacher approached me about Margot's progress. Normal exchange.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Open loops & reflection</div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card">
+      <div class="card-title">Open loops <span class="card-title-sub">13 total · 1 closed this week</span></div>
+      <div class="loop-row"><div class="loop-dot" style="background:var(--coral)"></div><div style="flex:1"><div class="loop-name">Dean Ball court case reply</div><div class="loop-domain">Personal/Legal · Mon AM anchor — no more carrying</div></div><span class="loop-badge loop-critical">CRITICAL</span></div>
+      <div class="loop-row"><div class="loop-dot" style="background:var(--coral)"></div><div style="flex:1"><div class="loop-name">ISA deadline tasks</div><div class="loop-domain">Finance · tax year deadline</div></div><span class="loop-badge loop-critical">high</span></div>
+      <div class="loop-row"><div class="loop-dot" style="background:var(--amber)"></div><div style="flex:1"><div class="loop-name">MVP homework from Tom</div><div class="loop-domain">BTP/Personal · due Tue 17 Mar</div></div><span class="loop-badge loop-priority">due Tue</span></div>
+      <div class="loop-row"><div class="loop-dot" style="background:var(--amber)"></div><div style="flex:1"><div class="loop-name">OYF competitor research</div><div class="loop-domain">Business/OYF · fascinating task</div></div><span class="loop-badge loop-priority">priority</span></div>
+      <div class="loop-row"><div class="loop-dot" style="background:rgba(255,255,255,0.2)"></div><div style="flex:1"><div class="loop-name">House snagging (~17 items)</div><div class="loop-domain">Home</div></div><span class="loop-badge loop-open">open</span></div>
+      <div class="loop-row"><div class="loop-dot" style="background:rgba(255,255,255,0.2)"></div><div style="flex:1"><div class="loop-name">Set up new will · ISA · Insurance · Hill Farm</div><div class="loop-domain">Finance/Personal</div></div><span class="loop-badge loop-open">open</span></div>
+      <div class="loop-row"><div class="loop-dot" style="background:rgba(255,255,255,0.2)"></div><div style="flex:1"><div class="loop-name">Reply to Jess / Kian · Mum + Dad dates</div><div class="loop-domain">Personal/Family</div></div><span class="loop-badge loop-open">open</span></div>
+      <div class="loop-row" style="opacity:.5"><div class="loop-dot" style="background:var(--teal)"></div><div style="flex:1"><div class="loop-name" style="text-decoration:line-through">NIL Agency formal closure</div><div class="loop-domain">Closed 7 Mar</div></div><span class="loop-badge" style="background:var(--teal-dim);color:var(--teal);border-color:rgba(52,217,160,0.25)">closed</span></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <div class="card-title">BTP reflection — w/c 15 Mar</div>
+        <div class="reflect-grid">
+          <div><div class="reflect-q">What went well</div><div class="reflect-a">Strong training back half (Thu–Sun). 3h OYF deep work Friday. Theatre trip with Nat. Planning system built.</div></div>
+          <div><div class="reflect-q">What needs addressing first</div><div class="reflect-a">Dean Bali — Monday AM hard block. On the plan every day and never actioned. Avoidance, not scheduling.</div></div>
+          <div><div class="reflect-q">Consistency gaps</div><div class="reflect-a">S&C 0/10. OYF only once. Frog avoidance — 3 carried all week.</div></div>
+          <div><div class="reflect-q">Forward focus</div><div class="reflect-a">Protected blocks every Plan A day. When structure is in place the work does itself.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Tom's active frameworks</div>
+        <div class="fw-grid">
+          <div class="fw-row"><span class="fw-tag" style="background:var(--purple-dim);color:var(--purple);border:1px solid rgba(157,133,245,0.2)">Is this 100% true?</span><div class="fw-desc">5 logged. Avg drop −3.6. Fortune Telling dominant (4/5). Reality always better.</div></div>
+          <div class="fw-row"><span class="fw-tag" style="background:var(--teal-dim);color:var(--teal);border:1px solid rgba(52,217,160,0.2)">Tomorrow Mark</span><div class="fw-desc">Dean Bali is the test. What would the leadership version of you do?</div></div>
+          <div class="fw-row"><span class="fw-tag" style="background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.2)">5 tasks not 15</span><div class="fw-desc">Frog avoidance broke this. Plan 5, complete 5. 100% = momentum.</div></div>
+          <div class="fw-row"><span class="fw-tag" style="background:var(--blue-dim);color:var(--blue);border:1px solid rgba(91,168,245,0.2)">F vs Fr</span><div class="fw-desc">OYF = Fascinating (peak hours). Dean Bali = Frustrating (do first, not last).</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-nav">
+    <button class="nav-btn">Today's plan</button>
+    <button class="nav-btn">Weekly review</button>
+    <button class="nav-btn">Update scores</button>
+    <button class="nav-btn">Training Peaks</button>
+    <button class="nav-btn">BTP call prep</button>
+  </div>
+
+</div>
+</body>
+</html>
